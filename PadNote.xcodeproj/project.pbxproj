@@ -16,11 +16,6 @@
 			path = PadNote;
 			sourceTree = "<group>";
 		};
-		3A311FFE300EC708000E2A7F /* Model */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Model;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,7 +34,6 @@
 			children = (
 				3A311FDE300AB56F000E2A7F /* PadNote */,
 				3A311FDD300AB56F000E2A7F /* Products */,
-				3A311FFE300EC708000E2A7F /* Model */,
 			);
 			sourceTree = "<group>";
 		};
@@ -68,7 +62,6 @@
 			);
 			fileSystemSynchronizedGroups = (
 				3A311FDE300AB56F000E2A7F /* PadNote */,
-				3A311FFE300EC708000E2A7F /* Model */,
 			);
 			name = PadNote;
 			packageProductDependencies = (
