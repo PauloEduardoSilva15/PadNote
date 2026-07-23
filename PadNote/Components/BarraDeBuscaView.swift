@@ -15,7 +15,6 @@ public struct BarraDeBuscaView: View {
                 Image(systemName: "magnifyingglass")
                     .font(Font.system(size: 22))
                 TextField("Buscar", text: $textoBusca)
-                
                 Spacer()
             }
             .padding()
@@ -31,12 +30,7 @@ public struct BarraDeBuscaView: View {
             }
             .padding()
             .glassEffect(in: .circle)
-            
-                   
         }
-        
-
-            
     }
 }
 
