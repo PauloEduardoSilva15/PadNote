@@ -1,17 +1,17 @@
 //
-//  CriptographScreen.swift
+//  Descriptography.swift
 //  PadNote
 //
-//  Created by Paulo Eduardo Barbosa da Silva on 20/07/26.
+//  Created by Paulo Eduardo Barbosa da Silva on 22/07/26.
 //
 
 import SwiftUI
 
-struct CriptographyScreen: View {
+struct DescriptographyScreen: View {
     var body: some View {
         VStack(spacing: 200){
             HStack{
-                Text("Criptografar")
+                Text("Descriptografar")
                     .font(.title)
             }
             VStack(spacing: 30){
@@ -22,7 +22,7 @@ struct CriptographyScreen: View {
                     .background(RoundedRectangle(cornerRadius: 8).foregroundStyle(.criptographyTextField))
                     .padding(.horizontal)
                 
-                Button("Criptografar"){
+                Button("Descriptografar"){
 
                 }
                 .padding()
@@ -31,7 +31,6 @@ struct CriptographyScreen: View {
                 .foregroundStyle(Color.white)
                 .cornerRadius(20)
             }
-
             
         }.padding(.bottom, 200)
         
@@ -39,5 +38,5 @@ struct CriptographyScreen: View {
 }
 
 #Preview {
-    CriptographyScreen()
+    DescriptographyScreen()
 }
