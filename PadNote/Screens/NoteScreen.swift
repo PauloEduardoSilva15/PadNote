@@ -9,9 +9,10 @@ import SwiftUI
 
 struct NoteScreen: View {
     @State var note: String = ""
-    let fonts: [String] = ["8pt","10pt","12pt","14pt","16pt","20pt"]
-    let fontsAlignment: [String] = ["left","center","right", "justify"]
-    @State var selectedFont: String = "14pt"
+    let fonts: [String] = ["8pt","10pt","12pt","14pt","16pt","20pt", "24pt"]
+    let fontsAlignment: [String] = ["text.justify.left","text.justify","text.justify.right"]
+    @State var selectedAlignment: String = "text.justify.left"
+    @State var selectedFont: String = "8pt"
     
     var body: some View {
         VStack{
@@ -52,6 +53,31 @@ struct NoteScreen: View {
                         .frame(height: 20)
                         .background(Color.white.opacity(0.3))
                     
+                    Menu{
+                        ForEach(fontsAlignment, id: \.self){index in
+                            Button{
+                                selectedAlignment = index
+                            }label:{
+                                Image(systemName: index)
+                            }
+                            
+                        }
+                    }label: {
+                        Image(systemName: selectedAlignment)
+                    }
+                    Divider()
+                        .frame(height: 20)
+                        .background(Color.white.opacity(0.3))
+                    
+                    Button{
+                        
+                    }label:{
+                        Image(systemName: "italic")
+                    }
+                    Divider()
+                        .frame(height: 20)
+                        .background(Color.white.opacity(0.3))
+                    
                     Button{
                         
                     }label:{
@@ -61,7 +87,16 @@ struct NoteScreen: View {
                         .frame(height: 20)
                         .background(Color.white.opacity(0.3))
                     
+                    Button{
                         
+                    }label:{
+                        Image(systemName: "paintpalette")
+
+                    }
+                    Divider()
+                        .frame(height: 20)
+                        .background(Color.white.opacity(0.3))
+                    
                     
                 }.foregroundColor(.black)
                     .padding(.horizontal, 20)
