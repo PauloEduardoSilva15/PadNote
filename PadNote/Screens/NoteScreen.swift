@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct NoteScreen: View {
+    @Environment(\.colorScheme) var colorScheme
+    
     @State var note: String = ""
     let fontsSize: [Int] = [8,10,12,14,16,20,24,32,48,64]
     let fontsAlignment: [String] = ["text.alignleft",
@@ -33,15 +35,13 @@ struct NoteScreen: View {
     @State var selectedAlignment: TextAlignment = .leading
     @State var selectedSize: CGFloat = 16
     @State var selectedFont: String = "Helvetica"
-    @State var selectedColor: Color = .black
     @State var isBold: Bool = false
     @State var isItalic: Bool = false
+    @State var selectedColor: Color = .black
     
     var body: some View {
+        
         VStack{
-            Text("Nome da nota")
-                .font(.title2)
-            Divider()
             ZStack{
                 TextEditor(text: $note)
                     .foregroundStyle(selectedColor)
@@ -51,91 +51,75 @@ struct NoteScreen: View {
                     .italic(isItalic)
                     .padding()
                     .lineSpacing(5)
-                HStack{
-
-                    Menu{
+                
+            }
+            
+        }
+            .navigationTitle("Nome da nota")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    // Menu de fontes
+                    Menu {
                         ScrollView {
                             ForEach(systemFonts, id: \.self) { fontName in
                                 Button(fontName) {
                                     selectedFont = fontName
                                 }
-                                    .font(.custom(fontName, size: 14))
+                                .font(.custom(fontName, size: 14))
                             }
                         }
-                                                .frame(maxHeight: 300)
-                    }label:{
+                        .frame(maxHeight: 300)
+                    } label: {
                         Image(systemName: "textformat")
                     }
                     
-                    DivideMenuTexBox()
-                    
-                    Menu("\(Int(selectedSize))pt"){
-                        ForEach(fontsSize, id: \.self){index in
-                            Button("\(index)pt"){
+                    // Menu de tamanho
+                    Menu("\(Int(selectedSize))pt") {
+                        ForEach(fontsSize, id: \.self) { index in
+                            Button("\(index)pt") {
                                 selectedSize = CGFloat(index)
                             }
                         }
                     }
-                    DivideMenuTexBox()
                     
-                    Menu{
-                        ForEach(fontsAlignment, id: \.self){index in
-                            Button{
+                    Menu {
+                        ForEach(fontsAlignment, id: \.self) { index in
+                            Button {
                                 selectedAlignmentPath = index
-                                if let alignment = alignmentDictionarie[index]{
+                                if let alignment = alignmentDictionarie[index] {
                                     selectedAlignment = alignment
-                                }
-                                else {
+                                } else {
                                     selectedAlignment = .leading
                                 }
-                            }label:{
+                            } label: {
                                 Image(systemName: index)
                             }
-                            
                         }
-                    }label: {
+                    } label: {
                         Image(systemName: selectedAlignmentPath)
                     }
-                    DivideMenuTexBox()
-                    
-                    Button{
+                    Button {
                         isBold.toggle()
-                        
-                    }label:{
+                    } label: {
                         Image(systemName: "bold")
                     }
-                    DivideMenuTexBox()
-                    
-                    Button{
+                    Button {
                         isItalic.toggle()
-                    }label:{
+                    } label: {
                         Image(systemName: "italic")
                     }
-                    DivideMenuTexBox()
                     
-                    ColorPicker("Color Selected", selection: $selectedColor)
-                        .labelsHidden()
-                    
-                    DivideMenuTexBox()
-                    
-                    Button{
-                        
-                    }label:{
+                    Button {
+                        // Ação para barcode
+                    } label: {
                         Image(systemName: "barcode.viewfinder")
                     }
                     
-                }.foregroundColor(.black)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(
-                        Capsule()
-                            .fill(.menu)
-                            
-                    )
-                    .padding()
-
+                    ColorPicker("", selection: $selectedColor)
+                        .labelsHidden()
+                }
             }
-        }
     }
 }
             
@@ -143,5 +127,8 @@ struct NoteScreen: View {
 
 
 #Preview {
-    NoteScreen()
+    NavigationStack{
+        NoteScreen()
+    }
+    
 }

@@ -11,7 +11,9 @@ import SwiftUI
 struct PadNoteApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                NoteScreen()
+            }
         }
     }
 }
