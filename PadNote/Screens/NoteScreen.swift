@@ -9,10 +9,33 @@ import SwiftUI
 
 struct NoteScreen: View {
     @State var note: String = ""
-    let fonts: [String] = ["8pt","10pt","12pt","14pt","16pt","20pt", "24pt"]
-    let fontsAlignment: [String] = ["text.justify.left","text.justify","text.justify.right"]
-    @State var selectedAlignment: String = "text.justify.left"
-    @State var selectedFont: String = "8pt"
+    let fontsSize: [Int] = [8,10,12,14,16,20,24,32,48,64]
+    let fontsAlignment: [String] = ["text.alignleft",
+                                    "text.aligncenter",
+                                    "text.alignright"]
+    let alignmentDictionarie: [String: TextAlignment] =
+    [
+        "text.alignleft": .leading,
+        "text.aligncenter": .center,
+        "text.alignright": .trailing
+    ]
+    var systemFonts: [String] {
+            var fonts: [String] = []
+            for family in UIFont.familyNames.sorted() {
+                for font in UIFont.fontNames(forFamilyName: family) {
+                    fonts.append(font)
+                }
+            }
+            return fonts
+        }
+    
+    @State var selectedAlignmentPath: String = "text.alignleft"
+    @State var selectedAlignment: TextAlignment = .leading
+    @State var selectedSize: CGFloat = 16
+    @State var selectedFont: String = "Helvetica"
+    @State var selectedColor: Color = .black
+    @State var isBold: Bool = false
+    @State var isItalic: Bool = false
     
     var body: some View {
         VStack{
@@ -21,85 +44,88 @@ struct NoteScreen: View {
             Divider()
             ZStack{
                 TextEditor(text: $note)
+                    .foregroundStyle(selectedColor)
+                    .font(.custom(selectedFont, size: selectedSize))
+                    .multilineTextAlignment(selectedAlignment)
+                    .bold(isBold)
+                    .italic(isItalic)
                     .padding()
                     .lineSpacing(5)
                 HStack{
+
                     Menu{
-                        Button("Helvetica"){
-                        
+                        ScrollView {
+                            ForEach(systemFonts, id: \.self) { fontName in
+                                Button(fontName) {
+                                    selectedFont = fontName
+                                }
+                                    .font(.custom(fontName, size: 14))
+                            }
                         }
-                        Button("São Francisco"){
-                            
-                        }
-                        Button("Arial"){
-                            
-                        }
+                                                .frame(maxHeight: 300)
                     }label:{
                         Image(systemName: "textformat")
                     }
                     
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
-                    Menu(selectedFont){
-                        ForEach(fonts, id: \.self){index in
-                            Button(index){
-                                selectedFont = index
+                    DivideMenuTexBox()
+                    
+                    Menu("\(Int(selectedSize))pt"){
+                        ForEach(fontsSize, id: \.self){index in
+                            Button("\(index)pt"){
+                                selectedSize = CGFloat(index)
                             }
-                            
                         }
                     }
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
+                    DivideMenuTexBox()
                     
                     Menu{
                         ForEach(fontsAlignment, id: \.self){index in
                             Button{
-                                selectedAlignment = index
+                                selectedAlignmentPath = index
+                                if let alignment = alignmentDictionarie[index]{
+                                    selectedAlignment = alignment
+                                }
+                                else {
+                                    selectedAlignment = .leading
+                                }
                             }label:{
                                 Image(systemName: index)
                             }
                             
                         }
                     }label: {
-                        Image(systemName: selectedAlignment)
+                        Image(systemName: selectedAlignmentPath)
                     }
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
+                    DivideMenuTexBox()
                     
                     Button{
+                        isBold.toggle()
                         
+                    }label:{
+                        Image(systemName: "bold")
+                    }
+                    DivideMenuTexBox()
+                    
+                    Button{
+                        isItalic.toggle()
                     }label:{
                         Image(systemName: "italic")
                     }
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
+                    DivideMenuTexBox()
+                    
+                    ColorPicker("Color Selected", selection: $selectedColor)
+                        .labelsHidden()
+                    
+                    DivideMenuTexBox()
                     
                     Button{
                         
                     }label:{
                         Image(systemName: "barcode.viewfinder")
                     }
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
-                    
-                    Button{
-                        
-                    }label:{
-                        Image(systemName: "paintpalette")
-
-                    }
-                    Divider()
-                        .frame(height: 20)
-                        .background(Color.white.opacity(0.3))
-                    
                     
                 }.foregroundColor(.black)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(
                         Capsule()
