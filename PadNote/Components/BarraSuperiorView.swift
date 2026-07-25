@@ -61,32 +61,8 @@ struct BarraSuperiorView: View {
                 
             }.overlay(Text("Suas Notas"))
                 .padding(5)
-            //Spacer()
         }  
     }
-    
-    
-    //        NavigationStack {
-    //            List {
-    //                Text("Biografia Jakob")
-    //                Text("Psicologia das cores")
-    //            }
-    //            .navigationTitle("Pesquisa")
-    //            // Modificador nativo do SwiftUI
-    //            .searchable(
-    //                text: $searchText,
-    //                placement: .navigationBarDrawer(displayMode: .always),
-    //                prompt: "Pesquisar"
-    //            )
-    //            .toolbar {
-    //                // O botão de lápis/edição precisa ir para a Toolbar
-    //                ToolbarItem(placement: .topBarTrailing) {
-    //                    Button(action: {}) {
-    //                        Image(systemName: "square.and.pencil")
-    //                    }
-    //                }
-    //            }
-    //        }
 }
 
 

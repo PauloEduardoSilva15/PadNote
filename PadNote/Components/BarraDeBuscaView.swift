@@ -27,6 +27,7 @@ public struct BarraDeBuscaView: View {
                 Image(systemName: "square.and.pencil")
                     .fontWeight(.bold)
                     .font(Font.system(size: 22))
+                
             }
             .padding()
             .glassEffect(in: .circle)

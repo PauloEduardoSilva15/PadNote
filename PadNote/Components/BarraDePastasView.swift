@@ -33,6 +33,7 @@ struct BarraDePastasView: View {
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(.black)
                             .glassEffect(in: .circle)
+                            .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
                     }
                     Text("Suas pastas")
                         .font(.system(size: 17, weight: .semibold))
@@ -76,6 +77,7 @@ struct BarraDePastasView: View {
                     }
                     .padding()
                     .glassEffect(in: .circle)
+                    .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
                     
                     Spacer()
                     Text("Adicionar pasta")
@@ -91,6 +93,7 @@ struct BarraDePastasView: View {
                     }
                     .padding()
                     .glassEffect(in: .circle)
+                    .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
                 }.padding()
                 VStack{
                     TextField("Nome da pasta", text: $nomePasta)
