@@ -9,11 +9,7 @@ import SwiftUI
 
 struct ConfirmCriptographyScreen: View {
     var body: some View {
-        VStack(spacing: 200){
-            Text("Criptografia")
-                .font(.title)
-            VStack(spacing: 48){
-                
+        VStack(spacing: 100){
                 CriptografiedMensager()
                 Button("Voltar a tela inicial"){
 
@@ -23,17 +19,16 @@ struct ConfirmCriptographyScreen: View {
                 .foregroundStyle(Color.white)
                 .bold()
                 .cornerRadius(20)
-            }
-            .padding(.bottom, 200)
             
-            
-
-            
-        }
+        }.navigationTitle("Criptografado")
+            .navigationBarTitleDisplayMode(.inline)
         
     }
 }
 
 #Preview {
-    ConfirmCriptographyScreen()
+    NavigationStack {
+        ConfirmCriptographyScreen()
+    }
+    
 }

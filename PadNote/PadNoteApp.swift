@@ -12,7 +12,7 @@ struct PadNoteApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                NoteScreen()
+                CriptographyScreen()
             }
         }
     }

@@ -9,12 +9,7 @@ import SwiftUI
 
 struct CriptographyScreen: View {
     var body: some View {
-        VStack(spacing: 200){
-            HStack{
-                Text("Criptografar")
-                    .font(.title)
-            }
-            VStack(spacing: 30){
+        VStack(spacing: 50){
                 TextField("Insira a sua chave de criptografia", text: .constant(""), axis: .vertical)
                     .padding(10)
                     .lineLimit(5...5)
@@ -30,14 +25,14 @@ struct CriptographyScreen: View {
                 .background(.buttonColors)
                 .foregroundStyle(Color.white)
                 .cornerRadius(20)
-            }
-
-            
-        }.padding(.bottom, 200)
+        }.navigationTitle("Criptografar")
+        .navigationBarTitleDisplayMode(.inline)
         
     }
 }
 
 #Preview {
-    CriptographyScreen()
+    NavigationStack{
+        CriptographyScreen()
+    }
 }
