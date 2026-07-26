@@ -32,10 +32,9 @@ struct BarraSuperiorView: View {
                     
                 }
                 Spacer()
+                
                 HStack(spacing: 20){
-                    Button(action: {
-                        print("teste configuracoes")
-                    }){
+                    NavigationLink(destination: TelaConfiguracoesView()){
                         Image(systemName: "gearshape")
                             .font(Font.system(size: 22))
                             .fontWeight(.bold)
@@ -61,6 +60,7 @@ struct BarraSuperiorView: View {
                 
             }.overlay(Text("Suas Notas"))
                 .padding(5)
+            //Spacer()
         }  
     }
 }

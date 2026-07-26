@@ -69,6 +69,7 @@ struct BarraDePastasView: View {
             VStack(spacing: 25){
                 HStack{
                     Button(action: {
+                        nomePasta = ""
                         abrirSheet.toggle()
                     })
                     {
