@@ -27,15 +27,7 @@ struct BotaoBarraView: View {
 }
 
 #Preview {
-    ZStack {
-        // Fundo para testar o efeito de transparência/vidro
-        LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
-            .ignoresSafeArea()
+    BotaoBarraView(titulo: "aaaa", icone: "gearshape"){
         
-        VStack {
-            Spacer()
-            //BarraInferiorView()
-                .padding(.horizontal)
-        }
     }
 }
