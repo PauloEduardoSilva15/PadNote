@@ -23,6 +23,7 @@ struct ConfirmCriptographyScreen: View {
         }.navigationTitle("Criptografado")
             .navigationBarTitleDisplayMode(.inline)
         
+        
     }
 }
 

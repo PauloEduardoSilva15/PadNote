@@ -34,7 +34,7 @@ struct BotaoBarraView: View {
         
         VStack {
             Spacer()
-            BarraInferiorView()
+            //BarraInferiorView()
                 .padding(.horizontal)
         }
     }
