@@ -8,35 +8,36 @@
 import SwiftUI
 
 struct DescriptographyScreen: View {
+    @State var message: String = ""
     var body: some View {
-        VStack(spacing: 200){
-            HStack{
-                Text("Descriptografar")
-                    .font(.title)
-            }
-            VStack(spacing: 30){
-                TextField("Insira a sua chave de criptografia", text: .constant(""), axis: .vertical)
-                    .padding(10)
-                    .lineLimit(5...5)
-                    .frame(width: 300, height: 150)
-                    .background(RoundedRectangle(cornerRadius: 8).foregroundStyle(.criptographyTextField))
-                    .padding(.horizontal)
-                
+            VStack(spacing: 50){
+                TextField(text: $message, axis: .vertical){
+                    Text("Insira a sua chave de criptografia")
+                        .foregroundStyle(.gray)
+                }
+                .frame(width: 300)
+                .padding()
+                .lineLimit(5...5)
+                .foregroundColor(.black)
+                .background(RoundedRectangle(cornerRadius: 8).foregroundStyle(.criptographyTextField))
+                    
+                    
                 Button("Descriptografar"){
 
                 }
-                .padding()
-                .bold()
-                .background(.buttonColors)
-                .foregroundStyle(Color.white)
-                .cornerRadius(20)
-            }
-            
-        }.padding(.bottom, 200)
+                    .padding()
+                    .bold()
+                    .background(.buttonColors)
+                    .foregroundStyle(Color.white)
+                    .cornerRadius(20)
+            }.navigationTitle("Descriptografar")
+            .navigationBarTitleDisplayMode(.inline)
         
     }
 }
 
 #Preview {
-    DescriptographyScreen()
+    NavigationStack{
+        DescriptographyScreen()
+    }
 }

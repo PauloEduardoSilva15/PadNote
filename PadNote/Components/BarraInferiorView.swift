@@ -8,30 +8,35 @@
 import SwiftUI
 
 struct BarraInferiorView: View {
+    let onDelete: () -> Void
+    let onMove: () -> Void
+    let onEncrypt: () -> Void
+    let onShare: () -> Void
+    
     var body: some View {
         HStack {
             Spacer()
             
             BotaoBarraView(titulo: "Mover", icone: "arrow.forward.folder") {
-                // Ação para mover
+                onMove()
             }
             
             Spacer()
             
             BotaoBarraView(titulo: "Criptografar", icone: "lock") {
-                // Ação para criptografar
+                onEncrypt()
             }
             
             Spacer()
             
             BotaoBarraView(titulo: "Compartilhar", icone: "square.and.arrow.up") {
-                // Ação para compartilhar
+                onShare()
             }
             
             Spacer()
             
             BotaoBarraView(titulo: "Excluir", icone: "trash", isDestructive: true) {
-                // Ação para excluir
+                onDelete()
             }
             
             Spacer()
@@ -43,5 +48,19 @@ struct BarraInferiorView: View {
 }
 
 #Preview {
-    BarraInferiorView()
+    ZStack {
+        LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
+            .ignoresSafeArea()
+        
+        VStack {
+            Spacer()
+            BarraInferiorView(
+                onDelete: {},
+                onMove: {},
+                onEncrypt: {},
+                onShare: {}
+            )
+            .padding(.horizontal)
+        }
+    }
 }

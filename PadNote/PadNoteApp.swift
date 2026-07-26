@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct PadNoteApp: App {
+    @State private var noteManager = NoteManager()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TelaInicialView()
+                .environment(noteManager)
         }
     }
 }

@@ -8,26 +8,25 @@
 import SwiftUI
 
 public struct BarraDeBuscaView: View {
-    @State var textoBusca: String = ""
+    @Binding var searchText: String
+    let onCreateNote: () -> Void
+    
     public var body: some View {
-        HStack{
-            HStack{
+        HStack {
+            HStack {
                 Image(systemName: "magnifyingglass")
                     .font(Font.system(size: 22))
-                TextField("Buscar", text: $textoBusca)
+                TextField("Buscar", text: $searchText)
                 Spacer()
             }
             .padding()
             .frame(width: 268, height: 47)
             .glassEffect(.regular, in: .rect(cornerRadius: 24))
             
-            Button(action: {
-                print("Adicionar nota")
-            }){
+            Button(action: onCreateNote) {
                 Image(systemName: "square.and.pencil")
                     .fontWeight(.bold)
                     .font(Font.system(size: 22))
-                
             }
             .padding()
             .glassEffect(in: .circle)
@@ -36,5 +35,5 @@ public struct BarraDeBuscaView: View {
 }
 
 #Preview {
-        BarraDeBuscaView()
+    BarraDeBuscaView(searchText: .constant(""), onCreateNote: {})
 }
