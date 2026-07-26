@@ -19,13 +19,13 @@ public struct Cards: View {
                 Text(note.content)
                     .font(.caption)
                     .multilineTextAlignment(.leading)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                     .lineLimit(3)
                 
             }
             //.padding()
             .frame(width: 138, height: 171)
-            .background(isSelected ? Color.blue.opacity(0.2) : Color.white.opacity(0.8))
+            .background(isSelected ? Color.blue.opacity(0.2) : Color.white)
             .cornerRadius(15)
             .shadow(color: Color.black.opacity(0.2), radius: 15, x: 0, y: 8)
             .overlay(
