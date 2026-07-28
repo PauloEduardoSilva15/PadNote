@@ -1,10 +1,9 @@
 //
-//  Teste1.swift
+//  TelaInicialView.swift
 //  PadNote
 //
 //  Created by Lucas on 21/07/26.
 //
-
 
 import SwiftUI
 
@@ -13,6 +12,11 @@ struct TelaInicialView: View {
     @State private var folderManager = FolderManager()
     @State private var searchText: String = ""
     @State private var menuAcionado: Bool = false
+    @State private var refreshID = UUID()
+    
+    // Estado para o alerta de título
+    @State private var mostrarAlertaTitulo: Bool = false
+    @State private var tituloNovaNota: String = ""
     
     let colunas = [
         GridItem(.flexible()),
@@ -20,19 +24,27 @@ struct TelaInicialView: View {
     ]
     
     var displayedNotes: [Note] {
-        // Pega as notas da pasta atual ou todas as notas
-        let notes: [Note]
-        if let currentFolder = folderManager.currentFolder {
-            notes = folderManager.getNotes(for: currentFolder, from: noteManager)
+        let _ = noteManager.notes.count
+        let _ = folderManager.currentFolder?.id
+        
+        let allNotes = noteManager.notes
+        let currentFolder = folderManager.currentFolder
+        
+        let filteredNotes: [Note]
+        if let currentFolder = currentFolder {
+            if currentFolder.isDefault {
+                filteredNotes = allNotes
+            } else {
+                filteredNotes = allNotes.filter { $0.folderId == currentFolder.id }
+            }
         } else {
-            notes = noteManager.notes
+            filteredNotes = allNotes
         }
         
-        // Aplica o filtro de busca
         if searchText.isEmpty {
-            return notes
+            return filteredNotes
         } else {
-            return notes.filter {
+            return filteredNotes.filter {
                 $0.title.localizedCaseInsensitiveContains(searchText) ||
                 $0.content.localizedCaseInsensitiveContains(searchText)
             }
@@ -47,7 +59,7 @@ struct TelaInicialView: View {
                     
                     ScrollView {
                         LazyVGrid(columns: colunas, spacing: 20) {
-                            ForEach(displayedNotes) { note in
+                            ForEach(displayedNotes, id: \.id) { note in
                                 Cards(
                                     note: note,
                                     isSelected: Binding(
@@ -73,9 +85,11 @@ struct TelaInicialView: View {
                                         }
                                     }
                                 )
+                                .id(note.id)
                             }
                         }
                         .padding()
+                        .id(refreshID)
                     }
                 }
                 .overlay {
@@ -92,24 +106,20 @@ struct TelaInicialView: View {
                     BarraInferiorView(
                         onDelete: {
                             noteManager.deleteNotes(noteManager.selectedNotes)
+                            refreshID = UUID()
                         },
-                        onMove: {
-                            // Mostrar sheet para mover notas entre pastas
-                            // Implementação futura
-                        },
-                        onEncrypt: {
-                            // Implementar criptografia
-                        },
-                        onShare: {
-                            // Implementar compartilhamento
-                        }
+                        onMove: {},
+                        onEncrypt: {},
+                        onShare: {}
                     )
+                    .id(refreshID)
                 } else {
                     BarraDeBuscaView(
                         searchText: $searchText,
                         onCreateNote: {
-                            // Cria nota na pasta atual (se houver)
-                            noteManager.createNote(folderId: folderManager.currentFolder?.id)
+                            // Abre o alerta para escolher o título
+                            tituloNovaNota = ""
+                            mostrarAlertaTitulo = true
                         }
                     )
                 }
@@ -122,6 +132,38 @@ struct TelaInicialView: View {
                 if let note = noteManager.currentNote {
                     NoteScreen(note: note, noteManager: noteManager)
                 }
+            }
+            .onChange(of: noteManager.notes.count) { _, _ in
+                refreshID = UUID()
+            }
+            // Alerta para escolher o título
+            .alert("Título da Nota", isPresented: $mostrarAlertaTitulo) {
+                TextField("Digite o título", text: $tituloNovaNota)
+                    .autocapitalization(.words)
+                
+                Button("Cancelar", role: .cancel) {
+                    tituloNovaNota = ""
+                }
+                
+                Button("Criar") {
+                    let titulo = tituloNovaNota.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if titulo.isEmpty {
+                        // Se o título estiver vazio, usa "Nova Nota"
+                        noteManager.createNote(
+                            title: "Nova Nota",
+                            folderId: folderManager.currentFolder?.id
+                        )
+                    } else {
+                        noteManager.createNote(
+                            title: titulo,
+                            folderId: folderManager.currentFolder?.id
+                        )
+                    }
+                    refreshID = UUID()
+                    tituloNovaNota = ""
+                }
+            } message: {
+                Text("Digite o título da sua nova nota")
             }
         }
         .environment(noteManager)

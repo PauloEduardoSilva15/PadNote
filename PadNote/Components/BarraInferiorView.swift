@@ -51,7 +51,6 @@ struct BarraInferiorView: View {
                                 Button(action: {
                                     // Pega as notas selecionadas
                                     let selectedNotes = noteManager.selectedNotes
-                                    print("Movendo \(selectedNotes.count) notas para pasta: \(pasta.name)")
                                     
                                     // Move as notas
                                     noteManager.moveNotesToFolder(selectedNotes, folderId: pasta.id)
@@ -59,16 +58,13 @@ struct BarraInferiorView: View {
                                     // Fecha a sheet
                                     telaMover = false
                                     
-                                    // Mostra feedback
-                                    mensagemFeedback = "\(selectedNotes.count) nota(s) movida(s) para \"\(pasta.name)\""
-                                    mostrarFeedback = true
                                     
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                         mostrarFeedback = false
                                     }
                                 }) {
                                     HStack {
-                                        Image(systemName: pasta.isDefault ? "folder.fill" : "folder")
+                                        Image(systemName: "folder")
                                             .foregroundColor(pasta.isDefault ? .blue : .primary)
                                         Text(pasta.name)
                                             .foregroundColor(.primary)
