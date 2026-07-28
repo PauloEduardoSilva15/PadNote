@@ -13,8 +13,6 @@ struct TelaInicialView: View {
     @State private var searchText: String = ""
     @State private var menuAcionado: Bool = false
     @State private var refreshID = UUID()
-    
-    // Estado para o alerta de título
     @State private var mostrarAlertaTitulo: Bool = false
     @State private var tituloNovaNota: String = ""
     
@@ -117,7 +115,6 @@ struct TelaInicialView: View {
                     BarraDeBuscaView(
                         searchText: $searchText,
                         onCreateNote: {
-                            // Abre o alerta para escolher o título
                             tituloNovaNota = ""
                             mostrarAlertaTitulo = true
                         }
@@ -148,7 +145,6 @@ struct TelaInicialView: View {
                 Button("Criar") {
                     let titulo = tituloNovaNota.trimmingCharacters(in: .whitespacesAndNewlines)
                     if titulo.isEmpty {
-                        // Se o título estiver vazio, usa "Nova Nota"
                         noteManager.createNote(
                             title: "Nova Nota",
                             folderId: folderManager.currentFolder?.id

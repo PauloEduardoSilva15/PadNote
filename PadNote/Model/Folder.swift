@@ -10,21 +10,16 @@ import Observation
 
 @Observable
 class FolderManager {
-    // MARK: - Propriedades
     var folders: [Folder] = []
     var currentFolder: Folder?
     var selectedFolderId: UUID?
-    
-    // MARK: - Inicializador
     init() {
-        // Cria a pasta padrão "Todas as Notas"
         let defaultFolder = Folder(name: "Todas as Notas", isDefault: true)
         folders.append(defaultFolder)
         currentFolder = defaultFolder
         selectedFolderId = defaultFolder.id
     }
-    
-    // MARK: - CRUD de Pastas
+
     func createFolder(name: String) {
         guard !name.isEmpty else { return }
         // Verifica se já existe uma pasta com o mesmo nome
@@ -37,13 +32,11 @@ class FolderManager {
     }
     
     func deleteFolder(_ folder: Folder) {
-        // Não permite deletar a pasta padrão
         guard !folder.isDefault else { return }
         
         if let index = folders.firstIndex(where: { $0.id == folder.id }) {
             folders.remove(at: index)
-            
-            // Se a pasta atual for deletada, volta para a pasta padrão
+
             if currentFolder?.id == folder.id {
                 currentFolder = folders.first(where: { $0.isDefault })
                 selectedFolderId = currentFolder?.id
@@ -70,10 +63,8 @@ class FolderManager {
     
     func getNotes(for folder: Folder, from noteManager: NoteManager) -> [Note] {
         if folder.isDefault {
-            // "Todas as Notas" mostra todas as notas
             return noteManager.notes
         } else {
-            // Mostra apenas notas da pasta específica
             return noteManager.notes.filter { $0.folderId == folder.id }
         }
     }
@@ -87,7 +78,7 @@ class FolderManager {
     }
 }
 
-// MARK: - Modelo Folder
+
 @Observable
 class Folder: Identifiable, Equatable {
     let id: UUID

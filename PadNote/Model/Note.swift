@@ -11,13 +11,10 @@ import Observation
 
 @Observable
 class NoteManager {
-    // MARK: - Propriedades
     var notes: [Note] = []
     var currentNote: Note?
     var selectedNoteIds: Set<UUID> = []
-    private var updateTrigger: Bool = false // Força atualização da UI
-    
-    // MARK: - Inicializador
+    private var updateTrigger: Bool = false
     init() {
         notes = [
             Note(title: "Bem-vindo", content: "Esta é sua primeira nota!"),
@@ -25,8 +22,6 @@ class NoteManager {
             Note(title: "Ideias", content: "Escreva suas ideias aqui...")
         ]
     }
-    
-    // MARK: - CRUD
     func createNote(title: String = "Nova Nota", content: String = "", folderId: UUID? = nil) {
         let newNote = Note(title: title, content: content, folderId: folderId)
         notes.insert(newNote, at: 0)
@@ -99,7 +94,6 @@ class NoteManager {
     
 }
 
-// MARK: - Modelo Note
 @Observable
 class Note: Identifiable, Equatable {
     let id: UUID
