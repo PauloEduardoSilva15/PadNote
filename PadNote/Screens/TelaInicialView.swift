@@ -10,20 +10,29 @@ import SwiftUI
 
 struct TelaInicialView: View {
     @State private var noteManager = NoteManager()
+    @State private var folderManager = FolderManager()
     @State private var searchText: String = ""
     @State private var menuAcionado: Bool = false
-    @State private var pastas: Set<String> = ["Todas as Notas"]
     
     let colunas = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
-    var filteredNotes: [Note] {
-        if searchText.isEmpty {
-            return noteManager.notes
+    var displayedNotes: [Note] {
+        // Pega as notas da pasta atual ou todas as notas
+        let notes: [Note]
+        if let currentFolder = folderManager.currentFolder {
+            notes = folderManager.getNotes(for: currentFolder, from: noteManager)
         } else {
-            return noteManager.notes.filter {
+            notes = noteManager.notes
+        }
+        
+        // Aplica o filtro de busca
+        if searchText.isEmpty {
+            return notes
+        } else {
+            return notes.filter {
                 $0.title.localizedCaseInsensitiveContains(searchText) ||
                 $0.content.localizedCaseInsensitiveContains(searchText)
             }
@@ -38,7 +47,7 @@ struct TelaInicialView: View {
                     
                     ScrollView {
                         LazyVGrid(columns: colunas, spacing: 20) {
-                            ForEach(filteredNotes) { note in
+                            ForEach(displayedNotes) { note in
                                 Cards(
                                     note: note,
                                     isSelected: Binding(
@@ -55,7 +64,6 @@ struct TelaInicialView: View {
                                         if noteManager.hasSelection {
                                             noteManager.toggleSelection(note)
                                         } else {
-                                            // Navegar para a nota
                                             noteManager.currentNote = note
                                         }
                                     },
@@ -65,13 +73,9 @@ struct TelaInicialView: View {
                                         }
                                     }
                                 )
-                                .onTapGesture {
-                                    // O tap já é tratado dentro do Cards
-                                }
                             }
                         }
                         .padding()
-
                     }
                 }
                 .overlay {
@@ -90,31 +94,28 @@ struct TelaInicialView: View {
                             noteManager.deleteNotes(noteManager.selectedNotes)
                         },
                         onMove: {
-                            // Implementar mover
+                            // Mostrar sheet para mover notas entre pastas
+                            // Implementação futura
                         },
                         onEncrypt: {
                             // Implementar criptografia
                         },
                         onShare: {
                             // Implementar compartilhamento
-                        },
-                        pastas: $pastas,
-                        
+                        }
                     )
                 } else {
                     BarraDeBuscaView(
                         searchText: $searchText,
                         onCreateNote: {
-                            noteManager.createNote()
+                            // Cria nota na pasta atual (se houver)
+                            noteManager.createNote(folderId: folderManager.currentFolder?.id)
                         }
                     )
                 }
                 
                 if menuAcionado {
-                    BarraDePastasView(
-                        menuIniciado: $menuAcionado,
-                        pastas: $pastas
-                    )
+                    BarraDePastasView(menuIniciado: $menuAcionado)
                 }
             }
             .navigationDestination(isPresented: .constant(noteManager.currentNote != nil)) {
@@ -124,6 +125,7 @@ struct TelaInicialView: View {
             }
         }
         .environment(noteManager)
+        .environment(folderManager)
     }
 }
 

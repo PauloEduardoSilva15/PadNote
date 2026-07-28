@@ -4,29 +4,32 @@
 //
 //  Created by Paulo Eduardo Barbosa da Silva on 25/07/26.
 //
+
+
 import SwiftUI
 import Observation
 
 @Observable
 class NoteManager {
-
+    // MARK: - Propriedades
     var notes: [Note] = []
     var currentNote: Note?
     var selectedNoteIds: Set<UUID> = []
-
+    private var updateTrigger: Bool = false // Força atualização da UI
     
+    // MARK: - Inicializador
     init() {
-        // Adiciona algumas notas de exemplo
         notes = [
             Note(title: "Bem-vindo", content: "Esta é sua primeira nota!"),
             Note(title: "Lista de Compras", content: "• Maçãs\n• Pão\n• Leite"),
             Note(title: "Ideias", content: "Escreva suas ideias aqui...")
         ]
     }
-
-    func createNote(title: String = "Nova Nota", content: String = "") {
-        let newNote = Note(title: title, content: content)
-        notes.insert(newNote, at: 0) // Adiciona no topo
+    
+    // MARK: - CRUD
+    func createNote(title: String = "Nova Nota", content: String = "", folderId: UUID? = nil) {
+        let newNote = Note(title: title, content: content, folderId: folderId)
+        notes.insert(newNote, at: 0)
         currentNote = newNote
     }
     
@@ -49,7 +52,7 @@ class NoteManager {
         }
     }
     
-    func updateNote(_ note: Note, title: String? = nil, content: String? = nil) {
+    func updateNote(_ note: Note, title: String? = nil, content: String? = nil, folderId: UUID? = nil) {
         if let index = notes.firstIndex(where: { $0.id == note.id }) {
             if let newTitle = title {
                 notes[index].title = newTitle
@@ -57,7 +60,22 @@ class NoteManager {
             if let newContent = content {
                 notes[index].content = newContent
             }
+            if let newFolderId = folderId {
+                notes[index].folderId = newFolderId
+            }
+            notes[index].updatedAt = Date()
         }
+    }
+    
+    func moveNotesToFolder(_ notesToMove: [Note], folderId: UUID?) {
+        for note in notesToMove {
+            if let index = notes.firstIndex(where: { $0.id == note.id }) {
+                notes[index].folderId = folderId
+                notes[index].updatedAt = Date()
+              
+            }
+        }
+        clearSelection()
     }
     
     func toggleSelection(_ note: Note) {
@@ -69,8 +87,7 @@ class NoteManager {
     }
     
     func clearSelection() {
-        selectedNoteIds.removeAll()
-    }
+        selectedNoteIds.removeAll()    }
     
     var selectedNotes: [Note] {
         notes.filter { selectedNoteIds.contains($0.id) }
@@ -79,9 +96,10 @@ class NoteManager {
     var hasSelection: Bool {
         !selectedNoteIds.isEmpty
     }
+    
 }
 
-
+// MARK: - Modelo Note
 @Observable
 class Note: Identifiable, Equatable {
     let id: UUID
@@ -89,13 +107,15 @@ class Note: Identifiable, Equatable {
     var content: String
     var createdAt: Date
     var updatedAt: Date
+    var folderId: UUID?
     
-    init(id: UUID = UUID(), title: String = "", content: String = "") {
+    init(id: UUID = UUID(), title: String = "", content: String = "", folderId: UUID? = nil) {
         self.id = id
         self.title = title
         self.content = content
         self.createdAt = Date()
         self.updatedAt = Date()
+        self.folderId = folderId
     }
     
     static func == (lhs: Note, rhs: Note) -> Bool {
