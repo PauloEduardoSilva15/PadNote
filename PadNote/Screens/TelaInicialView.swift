@@ -97,7 +97,8 @@ struct TelaInicialView: View {
                         },
                         onShare: {
                             // Implementar compartilhamento
-                        }
+                        },
+                        pastas: $pastas,
                     )
                 } else {
                     BarraDeBuscaView(

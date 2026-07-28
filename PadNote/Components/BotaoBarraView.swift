@@ -28,6 +28,5 @@ struct BotaoBarraView: View {
 
 #Preview {
     BotaoBarraView(titulo: "aaaa", icone: "gearshape"){
-        
     }
 }
