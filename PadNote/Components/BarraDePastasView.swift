@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct BarraDePastasView: View {
+    @Environment(\.colorScheme) var colorScheme
     @Binding var menuIniciado: Bool
     @State var nomePasta: String = ""
     @State var abrirSheet = false
@@ -17,7 +18,7 @@ struct BarraDePastasView: View {
             HStack {
                 Rectangle()
                     .cornerRadius(20)
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(colorScheme == .light ? .white : .black)
                     .ignoresSafeArea()
                     .containerRelativeFrame(.horizontal){ size, axis in
                         size * 0.66
@@ -31,13 +32,12 @@ struct BarraDePastasView: View {
                         Image(systemName: "chevron.backward")
                             .padding(10)
                             .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(.black)
+                            .foregroundColor(colorScheme == .light ? .black : .white)
                             .glassEffect(in: .circle)
                             .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 4)
                     }
                     Text("Suas pastas")
                         .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.black)
                         .padding(.horizontal, 10)
                     Spacer()
                 }.padding()
