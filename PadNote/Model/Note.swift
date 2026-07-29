@@ -5,13 +5,14 @@
 //  Created by Paulo Eduardo Barbosa da Silva on 25/07/26.
 //
 
-
 import SwiftUI
 import Observation
 
 @Observable
 class NoteManager {
     var notes: [Note] = []
+    var criptografia = CriptografiaModel()
+    var navigationPath = NavigationPath()
     var currentNote: Note?
     var selectedNoteIds: Set<UUID> = []
     private var updateTrigger: Bool = false
@@ -73,6 +74,34 @@ class NoteManager {
         clearSelection()
     }
     
+    func encryptNote(_ note: Note) -> String? {
+        guard let retornoCriptografia = criptografia.criptografar(texto: note.content) else {
+            return nil
+        }
+        note.content = retornoCriptografia.mensagem
+        note.estaCriptografado = true
+        return retornoCriptografia.chave
+    }
+    
+    func encryptNoteComChaveExistente(_ note: Note, chave: String) -> Bool {
+        guard let mensagemCriptografada = criptografia.criptografarComChaveExistente(texto: note.content, chaveBase64: chave) else {
+            return false
+        }
+        note.content = mensagemCriptografada
+        note.estaCriptografado = true
+        return true
+    }
+    
+    func decryptNote(note: Note, chaveDescriptografar: String) -> Bool {
+        guard let mensagemOriginal = criptografia.descriptografar(mensagemCriptografada: note.content, chave: chaveDescriptografar) else {
+            return false
+        }
+        note.estaCriptografado = false
+        note.content = mensagemOriginal
+        return true
+    }
+    
+    
     func toggleSelection(_ note: Note) {
         if selectedNoteIds.contains(note.id) {
             selectedNoteIds.remove(note.id)
@@ -91,17 +120,23 @@ class NoteManager {
     var hasSelection: Bool {
         !selectedNoteIds.isEmpty
     }
-    
+    func irParaTelaInicial() {
+        navigationPath = NavigationPath() 
+    }
 }
 
+import Foundation
+import Observation
+
 @Observable
-class Note: Identifiable, Equatable {
+class Note: Identifiable, Equatable, Hashable {
     let id: UUID
     var title: String
     var content: String
     var createdAt: Date
     var updatedAt: Date
     var folderId: UUID?
+    var estaCriptografado: Bool = false
     
     init(id: UUID = UUID(), title: String = "", content: String = "", folderId: UUID? = nil) {
         self.id = id
@@ -114,5 +149,9 @@ class Note: Identifiable, Equatable {
     
     static func == (lhs: Note, rhs: Note) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

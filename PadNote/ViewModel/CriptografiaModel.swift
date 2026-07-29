@@ -34,17 +34,41 @@ class CriptografiaModel {
         return nil
     }
     
-    func descriptografar(mensagemCriptografada: String, chave: String) {
+    func criptografarComChaveExistente(texto: String, chaveBase64: String) -> String? {
+        guard let mensagemData = texto.data(using: .utf8) else { return nil }
+        guard let chaveData = Data(base64Encoded: chaveBase64) else { return nil }
+        guard [16, 24, 32].contains(chaveData.count) else { return nil }
+        
+        let chave = SymmetricKey(data: chaveData)
+        
         do {
-            guard let msgData = Data(base64Encoded: mensagemCriptografada) else { return }
-            guard let chaveData = Data(base64Encoded: chave) else { return }
+            let caixaSelada = try AES.GCM.seal(mensagemData, using: chave)
+            guard let mensagemCriptografadaData = caixaSelada.combined else { return nil }
+            return mensagemCriptografadaData.base64EncodedString()
+        } catch {
+            print("Erro ao criptografar com chave existente: \(error)")
+            return nil
+        }
+    }
+    
+    func descriptografar(mensagemCriptografada: String, chave: String) -> String? {
+        do {
+            guard let msgData = Data(base64Encoded: mensagemCriptografada),
+                  let chaveData = Data(base64Encoded: chave) else {
+                return nil
+            }
             
+            guard [16, 24, 32].contains(chaveData.count) else {
+                return nil
+            }
             let chaveSymmetric = SymmetricKey(data: chaveData)
             let caixaSelada = try AES.GCM.SealedBox(combined: msgData)
             let mensagemOriginal = try AES.GCM.open(caixaSelada, using: chaveSymmetric)
-            print("criptografia realizada com sucesso! sua mensagem original é: \(String(data: mensagemOriginal, encoding: .utf8) ?? "Descriptografia falhou")")
+            
+            return String(data: mensagemOriginal, encoding: .utf8)
         } catch {
             print("Erro ao descriptografar: \(error)")
+            return nil
         }
     }
 }
