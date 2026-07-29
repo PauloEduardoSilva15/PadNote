@@ -12,6 +12,7 @@ enum RotaNavegacao: Hashable {
     case telaCriptografadoComChave(chave: String)
     case descriptografar
     case detalheNota(id: UUID)
+    case confirmacaoCriptografia
 }
 
 struct TelaInicialView: View {
@@ -121,13 +122,7 @@ struct TelaInicialView: View {
                             noteManager.deleteNotes(noteManager.selectedNotes)
                             refreshID = UUID()
                         },
-                        onMove: { pastaEscolhida in
-                            noteManager.moveNotesToFolder(noteManager.selectedNotes, folderId: pastaEscolhida.id)
-                            refreshID = UUID()
-                        },
-                        onEncrypt: {},
-                        onShare: {},
-                        pastas: folderManager.folders
+                        onShare: {}
                     )
                     .id(refreshID)
                 } else {
@@ -156,8 +151,10 @@ struct TelaInicialView: View {
                     if let note = noteManager.notes.first(where: { $0.id == id }) {
                         NoteScreen(note: note, noteManager: noteManager)
                     }
+                case .confirmacaoCriptografia:
+                        ConfirmCriptographyScreen()
                 }
-            }
+            } 
             .onChange(of: noteManager.notes.count) { _, _ in
                 refreshID = UUID()
             }
@@ -185,7 +182,7 @@ struct TelaInicialView: View {
         .environment(\.navigationPath, $path)
         .environment(noteManager)
         .environment(folderManager)
-    }
+    } 
 }
 
 private struct NavigationPathKey: EnvironmentKey {

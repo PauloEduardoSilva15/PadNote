@@ -74,20 +74,33 @@ class NoteManager {
         clearSelection()
     }
     
-    func encryptNote(_ note: Note)  -> String {
-        var retornoCriptografia = criptografia.criptografar(texto: note.content)
-        note.content = retornoCriptografia!.mensagem ?? "erro"
+    func encryptNote(_ note: Note) -> String? {
+        guard let retornoCriptografia = criptografia.criptografar(texto: note.content) else {
+            return nil
+        }
+        note.content = retornoCriptografia.mensagem
         note.estaCriptografado = true
-        return retornoCriptografia!.chave ?? "erro"
-
+        return retornoCriptografia.chave
     }
     
-        
-    func decryptNote(note: Note, chaveDescriptografar: String) {
-        var mensagemOriginal = criptografia.descriptografar(mensagemCriptografada: note.content, chave: chaveDescriptografar)
+    func encryptNoteComChaveExistente(_ note: Note, chave: String) -> Bool {
+        guard let mensagemCriptografada = criptografia.criptografarComChaveExistente(texto: note.content, chaveBase64: chave) else {
+            return false
+        }
+        note.content = mensagemCriptografada
+        note.estaCriptografado = true
+        return true
+    }
+    
+    func decryptNote(note: Note, chaveDescriptografar: String) -> Bool {
+        guard let mensagemOriginal = criptografia.descriptografar(mensagemCriptografada: note.content, chave: chaveDescriptografar) else {
+            return false
+        }
         note.estaCriptografado = false
         note.content = mensagemOriginal
+        return true
     }
+    
     
     func toggleSelection(_ note: Note) {
         if selectedNoteIds.contains(note.id) {

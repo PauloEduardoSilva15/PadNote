@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DescriptographyScreen: View {
     @State var chaveDescriptografar1: String = ""
+    @State private var mostrarErroDescriptografia: Bool = false
     @Environment(NoteManager.self) private var notaManager
     @Environment(\.navigationPath) private var path
 
@@ -50,7 +51,6 @@ struct DescriptographyScreen: View {
 
             Spacer()
 
-            // Botão
             Button(action: descriptografar) {
                 Text("Descriptografar")
                     .font(.headline)
@@ -66,15 +66,24 @@ struct DescriptographyScreen: View {
         }
         .navigationTitle("Descriptografar")
         .navigationBarTitleDisplayMode(.inline)
+        .alert("Chave incorreta", isPresented: $mostrarErroDescriptografia) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Não foi possível descriptografar a nota com essa chave. Verifique e tente novamente.")
+        }
     }
 
     private func descriptografar() {
         if let notaCriptografada = notaManager.notes.first(where: { $0.estaCriptografado }) {
-            notaManager.decryptNote(
+            let sucesso = notaManager.decryptNote(
                 note: notaCriptografada,
                 chaveDescriptografar: chaveDescriptografar1
             )
-            path.wrappedValue = NavigationPath()
+            if sucesso {
+                path.wrappedValue = NavigationPath()
+            } else {
+                mostrarErroDescriptografia = true
+            }
         }
     }
 }

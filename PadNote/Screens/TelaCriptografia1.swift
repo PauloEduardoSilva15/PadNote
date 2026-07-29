@@ -12,6 +12,10 @@ struct TelaCriptografia1: View {
     @Environment(NoteManager.self) private var notaManager
     @Environment(\.navigationPath) private var path
     @State var chaveCriptografia: String = ""
+    @State private var mostrarErroCriptografia: Bool = false
+    @State private var mensagemErro: String = ""
+    @State private var mostrarSheetChaveExistente: Bool = false
+    @State private var chaveExistenteInserida: String = ""
     
     var body: some View {
         VStack(spacing: 40) {
@@ -38,9 +42,13 @@ struct TelaCriptografia1: View {
                 VStack(spacing: 16) {
                     Button(action: {
                         if let nota = notaManager.selectedNotes.first {
-                            chaveCriptografia = notaManager.encryptNote(nota)
-                            // Avança para a tela final passando a chave
-                            path.wrappedValue.append(RotaNavegacao.telaCriptografadoComChave(chave: chaveCriptografia))
+                            if let chave = notaManager.encryptNote(nota) {
+                                chaveCriptografia = chave
+                                path.wrappedValue.append(RotaNavegacao.telaCriptografadoComChave(chave: chaveCriptografia))
+                            } else {
+                                mensagemErro = "Não foi possível criptografar a nota. Tente novamente."
+                                mostrarErroCriptografia = true
+                            }
                         }
                     }) {
                         Text("Criptografar e gerar chave")
@@ -53,7 +61,8 @@ struct TelaCriptografia1: View {
                     .clipShape(Capsule())
                     
                     Button(action: {
-                        path.wrappedValue.append(RotaNavegacao.descriptografar)
+                        chaveExistenteInserida = ""
+                        mostrarSheetChaveExistente = true
                     }) {
                         Text("Já possuo uma chave")
                             .font(.system(size: 16))
@@ -63,6 +72,8 @@ struct TelaCriptografia1: View {
                             .background(corBotao.opacity(0.20))
                             .clipShape(Capsule())
                     }
+                    
+                    
                                         
                     Button(action: {}) {
                         Text("Como criptografar meus dados?")
@@ -77,6 +88,73 @@ struct TelaCriptografia1: View {
             }
         }
         .background(Color(red: 0.96, green: 0.96, blue: 0.97).ignoresSafeArea(.all))
+        .alert("Erro", isPresented: $mostrarErroCriptografia) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(mensagemErro)
+        }
+        .sheet(isPresented: $mostrarSheetChaveExistente) {
+            VStack(spacing: 24) {
+                Text("Usar chave existente")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                
+                Text("Cole a chave que você já possui para criptografar essa nota com ela.")
+                    .font(.subheadline)
+                    .foregroundColor(Color.black.opacity(0.7))
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                TextField("Cole sua chave aqui", text: $chaveExistenteInserida)
+                    .padding()
+                    .background(Color.black.opacity(0.05))
+                    .cornerRadius(12)
+                    .padding(.horizontal)
+                
+                HStack(spacing: 16) {
+                    Button(action: {
+                        mostrarSheetChaveExistente = false
+                    }) {
+                        Text("Cancelar")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(Color.red.opacity(0.1))
+                            .cornerRadius(12)
+                    }
+                    
+                    Button(action:{
+                        if let nota = notaManager.selectedNotes.first {
+                            let sucesso = notaManager.encryptNoteComChaveExistente(nota, chave: chaveExistenteInserida)
+                            
+                            if sucesso {
+                                mostrarSheetChaveExistente = false
+                                
+                                path.wrappedValue.append(RotaNavegacao.confirmacaoCriptografia)
+                                
+                            } else {
+                                mensagemErro = "Chave inválida. Verifique e tente novamente."
+                                mostrarErroCriptografia = true
+                            }
+                        }
+                    }
+                    ) {
+                        Text("Criptografar")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(corBotao)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .background(corBotao.opacity(0.1))
+                            .cornerRadius(12)
+
+                    }                }
+                .padding(.horizontal)
+            }
+            .padding(.top, 32)
+            .presentationDetents([.fraction(0.4), .medium])
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 

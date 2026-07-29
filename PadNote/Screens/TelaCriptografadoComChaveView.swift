@@ -10,6 +10,8 @@ import SwiftUI
 struct TelaCriptografadoComChaveView: View {
     @State var chave: String
     @Environment(\.navigationPath) private var path
+    @Environment(NoteManager.self) private var noteManager
+
     
     var body: some View {
         VStack(spacing: 50) {
@@ -33,8 +35,8 @@ struct TelaCriptografadoComChaveView: View {
             }
             
             Button("Concluir") {
-
                 path.wrappedValue = NavigationPath()
+                noteManager.selectedNoteIds.removeAll()
             }
             .padding()
             .frame(width: 250, height: 50)
@@ -51,4 +53,6 @@ struct TelaCriptografadoComChaveView: View {
 #Preview {
     TelaCriptografadoComChaveView(chave: "")
         .environment(\.navigationPath, .constant(NavigationPath()))
+        .environment(NoteManager())
+
 }

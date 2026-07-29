@@ -8,28 +8,31 @@
 import SwiftUI
 
 struct ConfirmCriptographyScreen: View {
+    @Environment(\.navigationPath) private var path
+    
     var body: some View {
         VStack(spacing: 100){
-                CriptografiedMensager()
-                Button("Voltar a tela inicial"){
-
-                }
-                .padding()
-                .background(.buttonColors)
-                .foregroundStyle(Color.white)
-                .bold()
-                .cornerRadius(20)
+            CriptografiedMensager()
             
-        }.navigationTitle("Criptografado")
-            .navigationBarTitleDisplayMode(.inline)
-        
-        
+            Button("Voltar a tela inicial") {
+                path.wrappedValue = NavigationPath()
+            }
+            .padding()
+            .background(.buttonColors)
+            .foregroundStyle(Color.white)
+            .bold()
+            .cornerRadius(20)
+            
+        }
+        .navigationTitle("Criptografado")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 #Preview {
     NavigationStack {
         ConfirmCriptographyScreen()
+            .environment(\.navigationPath, .constant(NavigationPath()))
     }
-    
 }
