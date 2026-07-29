@@ -15,7 +15,7 @@ struct TelaInicialView: View {
     @State private var refreshID = UUID()
     @State private var mostrarAlertaTitulo: Bool = false
     @State private var tituloNovaNota: String = ""
-    
+    @State private var descriptografarNota: Bool = false
     let colunas = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -77,7 +77,7 @@ struct TelaInicialView: View {
                                             // Navegar para a nota
                                             if note.estaCriptografado {
                                                 //var mudar de tela
-                                                descriptografarNota.toggle()
+                                                descriptografarNota = true
                                             }
                                             else {
                                                 noteManager.currentNote = note
@@ -168,6 +168,8 @@ struct TelaInicialView: View {
                 }
             } message: {
                 Text("Digite o título da sua nova nota")
+            }.navigationDestination(isPresented: $descriptografarNota) {
+                DescriptographyScreen()
             }
         }
         .environment(noteManager)

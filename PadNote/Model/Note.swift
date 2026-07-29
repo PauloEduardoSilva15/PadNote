@@ -12,6 +12,8 @@ import Observation
 @Observable
 class NoteManager {
     var notes: [Note] = []
+    var criptografia = CriptografiaModel()
+    var navigationPath = NavigationPath()
     var currentNote: Note?
     var selectedNoteIds: Set<UUID> = []
     private var updateTrigger: Bool = false
@@ -119,7 +121,7 @@ class Note: Identifiable, Equatable {
     var createdAt: Date
     var updatedAt: Date
     var folderId: UUID?
-    
+    var estaCriptografado: Bool = false
     init(id: UUID = UUID(), title: String = "", content: String = "", folderId: UUID? = nil) {
         self.id = id
         self.title = title
@@ -127,6 +129,8 @@ class Note: Identifiable, Equatable {
         self.createdAt = Date()
         self.updatedAt = Date()
         self.folderId = folderId
+        
+
     }
     
     static func == (lhs: Note, rhs: Note) -> Bool {
