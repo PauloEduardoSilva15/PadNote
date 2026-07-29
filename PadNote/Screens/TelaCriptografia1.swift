@@ -16,6 +16,7 @@ struct TelaCriptografia1: View {
     @State private var mensagemErro: String = ""
     @State private var mostrarSheetChaveExistente: Bool = false
     @State private var chaveExistenteInserida: String = ""
+    @State private var mostrarTutorial: Bool = false
     
     var body: some View {
         VStack(spacing: 40) {
@@ -72,16 +73,19 @@ struct TelaCriptografia1: View {
                             .background(corBotao.opacity(0.20))
                             .clipShape(Capsule())
                     }
-                    
-                    
-                                        
-                    Button(action: {}) {
+                
+                    Button(action: {
+                        mostrarTutorial = true
+                    }) {
                         Text("Como criptografar meus dados?")
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(corBotao)
                     }
                     .padding(.top, 10)
-                }
+
+                    .sheet(isPresented: $mostrarTutorial) {
+                        TutorialCriptografiaView()
+                    }                }
                 .padding(.horizontal, 32)
                 
                 Spacer()
@@ -138,6 +142,7 @@ struct TelaCriptografia1: View {
                                 mostrarErroCriptografia = true
                             }
                         }
+                        
                     }
                     ) {
                         Text("Criptografar")
