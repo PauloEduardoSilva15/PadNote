@@ -13,6 +13,7 @@ struct TelaInicialView: View {
     @State private var searchText: String = ""
     @State private var menuAcionado: Bool = false
     @State private var pastas: Set<String> = ["Todas as Notas"]
+    @State private var descriptografarNota: Bool = false
     
     let colunas = [
         GridItem(.flexible()),
@@ -56,7 +57,14 @@ struct TelaInicialView: View {
                                             noteManager.toggleSelection(note)
                                         } else {
                                             // Navegar para a nota
-                                            noteManager.currentNote = note
+                                            if note.estaCriptografado {
+                                                //var mudar de tela
+                                                descriptografarNota.toggle()
+                                            }
+                                            else {
+                                                noteManager.currentNote = note
+                                            }
+                                            
                                         }
                                     },
                                     onLongPress: {
@@ -91,9 +99,12 @@ struct TelaInicialView: View {
                         },
                         onMove: {
                             // Implementar mover
+                            
                         },
                         onEncrypt: {
                             // Implementar criptografia
+                            //nao e mais usado injecao feita direta na TelaEncriptografar1
+                            //noteManager.encryptNote(noteManager.selectedNotes.first!)
                         },
                         onShare: {
                             // Implementar compartilhamento
@@ -120,6 +131,9 @@ struct TelaInicialView: View {
                 if let note = noteManager.currentNote {
                     NoteScreen(note: note, noteManager: noteManager)
                 }
+            }
+            .navigationDestination(isPresented: $descriptografarNota) {
+                DescriptographyScreen()
             }
         }
         .environment(noteManager)

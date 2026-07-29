@@ -19,10 +19,10 @@ public struct Cards: View {
                 Text(note.content)
                     .font(.caption)
                     .multilineTextAlignment(.leading)
-                    .foregroundColor(.gray)
+                    .foregroundColor(note.estaCriptografado ? Color.gray.opacity(0) : Color.gray)
                     .lineLimit(3)
                 
-            }
+            }.background(note.estaCriptografado ? Image("imageCriptografia") : Image(systemName: ""))
             //.padding()
             .frame(width: 138, height: 171)
             .background(isSelected ? Color.blue.opacity(0.2) : Color.white)

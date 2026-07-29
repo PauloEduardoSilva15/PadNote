@@ -13,6 +13,8 @@ class NoteManager {
     var notes: [Note] = []
     var currentNote: Note?
     var selectedNoteIds: Set<UUID> = []
+    var criptografia = CriptografiaModel()
+    var navigationPath = NavigationPath()
 
     
     init() {
@@ -60,6 +62,21 @@ class NoteManager {
         }
     }
     
+    func encryptNote(_ note: Note)  -> String {
+        var retornoCriptografia = criptografia.criptografar(texto: note.content)
+        note.content = retornoCriptografia!.mensagem ?? "erro"
+        note.estaCriptografado = true
+        return retornoCriptografia!.chave ?? "erro"
+
+    }
+    
+        
+    func decryptNote(note: Note, chaveDescriptografar: String) {
+        var mensagemOriginal = criptografia.descriptografar(mensagemCriptografada: note.content, chave: chaveDescriptografar)
+        note.estaCriptografado = false
+        note.content = mensagemOriginal
+    }
+    
     func toggleSelection(_ note: Note) {
         if selectedNoteIds.contains(note.id) {
             selectedNoteIds.remove(note.id)
@@ -79,6 +96,9 @@ class NoteManager {
     var hasSelection: Bool {
         !selectedNoteIds.isEmpty
     }
+    func irParaTelaInicial() {
+        navigationPath = NavigationPath() 
+    }
 }
 
 
@@ -89,6 +109,7 @@ class Note: Identifiable, Equatable {
     var content: String
     var createdAt: Date
     var updatedAt: Date
+    var estaCriptografado: Bool = false
     
     init(id: UUID = UUID(), title: String = "", content: String = "") {
         self.id = id

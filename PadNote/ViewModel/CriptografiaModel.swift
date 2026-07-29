@@ -34,17 +34,24 @@ class CriptografiaModel {
         return nil
     }
     
-    func descriptografar(mensagemCriptografada: String, chave: String) {
+    func descriptografar(mensagemCriptografada: String, chave: String) -> String {
         do {
-            guard let msgData = Data(base64Encoded: mensagemCriptografada) else { return }
-            guard let chaveData = Data(base64Encoded: chave) else { return }
+            guard let msgData = Data(base64Encoded: mensagemCriptografada),
+                  let chaveData = Data(base64Encoded: chave) else {
+                return "Chave ou mensagem em formato invalido"
+            }
             
+            guard [16, 24, 32].contains(chaveData.count) else {
+                return "Tamanho de chave incorreto"
+            }
             let chaveSymmetric = SymmetricKey(data: chaveData)
             let caixaSelada = try AES.GCM.SealedBox(combined: msgData)
             let mensagemOriginal = try AES.GCM.open(caixaSelada, using: chaveSymmetric)
-            print("criptografia realizada com sucesso! sua mensagem original é: \(String(data: mensagemOriginal, encoding: .utf8) ?? "Descriptografia falhou")")
+            
+            return String(data: mensagemOriginal, encoding: .utf8) ?? "Erro na conversão de texto"
         } catch {
             print("Erro ao descriptografar: \(error)")
+            return "Chave incorreta"
         }
     }
 }

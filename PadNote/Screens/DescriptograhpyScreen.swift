@@ -9,23 +9,30 @@ import SwiftUI
 
 struct DescriptographyScreen: View {
     @State var message: String = ""
+    @Environment(NoteManager.self) private var notaManager
+    @State var chaveDescriptografar1: String = ""
     var body: some View {
             VStack(spacing: 50){
-                TextField(text: $message, axis: .vertical){
-                    Text("Insira a sua chave de criptografia")
-                        .foregroundStyle(.gray)
-                }
-                .frame(width: 300)
+                TextField("Insira a sua chave de criptografia", text: $chaveDescriptografar1)
+                .frame(width: 300,height: 200)
+                .cornerRadius(20)
                 .padding()
                 .lineLimit(5...5)
                 .foregroundColor(.black)
                 .background(RoundedRectangle(cornerRadius: 8).foregroundStyle(.criptographyTextField))
                     
                     
-                Button("Descriptografar"){
-
-                }
-                    .padding()
+                Button(action: {
+                    if let notaCriptografada = notaManager.notes.first(where: { $0.estaCriptografado }) {
+                        notaManager.decryptNote(
+                            note: notaCriptografada,
+                            chaveDescriptografar: chaveDescriptografar1
+                        )
+                        
+                    }
+                }) {
+                    Text("Descriptografar")
+                }.padding()
                     .bold()
                     .background(.buttonColors)
                     .foregroundStyle(Color.white)
@@ -39,5 +46,6 @@ struct DescriptographyScreen: View {
 #Preview {
     NavigationStack{
         DescriptographyScreen()
+            .environment(NoteManager())
     }
 }

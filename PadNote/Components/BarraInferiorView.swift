@@ -65,11 +65,12 @@ struct BarraInferiorView: View {
             Spacer()
             
             BotaoBarraView(titulo: "Criptografar", icone: "lock") {
-                onEncrypt()
+                //onEncrypt()
                 alertaCriptografar = true
             }.alert("Deseja criptografar essa nota?", isPresented: $alertaCriptografar) {
                 Button("Sim") {
-                    telaCriptografia = true
+                    //onEncrypt()
+                   telaCriptografia = true
 
                 }
                 
@@ -79,7 +80,7 @@ struct BarraInferiorView: View {
             } message: {
                 Text("Após a criptografia você só poderá descriptografar com a chave de acesso.")
             }.navigationDestination(isPresented: $telaCriptografia){
-                CriptographyScreen()
+                TelaCriptografia1()
             }
             
             Spacer()
