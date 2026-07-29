@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct PadNoteApp: App {
     @State private var noteManager = NoteManager()
+    @State private var folderManager = FolderManager()
     
     var body: some Scene {
         WindowGroup {
             TelaInicialView()
                 .environment(noteManager)
+                .environment(folderManager)
         }
     }
 }
