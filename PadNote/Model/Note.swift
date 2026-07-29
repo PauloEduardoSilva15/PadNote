@@ -5,7 +5,6 @@
 //  Created by Paulo Eduardo Barbosa da Silva on 25/07/26.
 //
 
-
 import SwiftUI
 import Observation
 
@@ -113,8 +112,11 @@ class NoteManager {
     }
 }
 
+import Foundation
+import Observation
+
 @Observable
-class Note: Identifiable, Equatable {
+class Note: Identifiable, Equatable, Hashable {
     let id: UUID
     var title: String
     var content: String
@@ -122,6 +124,7 @@ class Note: Identifiable, Equatable {
     var updatedAt: Date
     var folderId: UUID?
     var estaCriptografado: Bool = false
+    
     init(id: UUID = UUID(), title: String = "", content: String = "", folderId: UUID? = nil) {
         self.id = id
         self.title = title
@@ -129,11 +132,13 @@ class Note: Identifiable, Equatable {
         self.createdAt = Date()
         self.updatedAt = Date()
         self.folderId = folderId
-        
-
     }
     
     static func == (lhs: Note, rhs: Note) -> Bool {
         lhs.id == rhs.id
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }

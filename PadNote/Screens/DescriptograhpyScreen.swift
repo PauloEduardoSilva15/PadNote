@@ -8,43 +8,79 @@
 import SwiftUI
 
 struct DescriptographyScreen: View {
-    @State var message: String = ""
-    @Environment(NoteManager.self) private var notaManager
     @State var chaveDescriptografar1: String = ""
+    @Environment(NoteManager.self) private var notaManager
+    @Environment(\.navigationPath) private var path
+
+    private var chaveValida: Bool {
+        !chaveDescriptografar1.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     var body: some View {
-            VStack(spacing: 50){
-                TextField("Insira a sua chave de criptografia", text: $chaveDescriptografar1)
-                .frame(width: 300,height: 200)
-                .cornerRadius(20)
-                .padding()
-                .lineLimit(5...5)
-                .foregroundColor(.black)
-                .background(RoundedRectangle(cornerRadius: 8).foregroundStyle(.criptographyTextField))
-                    
-                    
-                Button(action: {
-                    if let notaCriptografada = notaManager.notes.first(where: { $0.estaCriptografado }) {
-                        notaManager.decryptNote(
-                            note: notaCriptografada,
-                            chaveDescriptografar: chaveDescriptografar1
-                        )
-                        
-                    }
-                }) {
-                    Text("Descriptografar")
-                }.padding()
-                    .bold()
-                    .background(.buttonColors)
-                    .foregroundStyle(Color.white)
-                    .cornerRadius(20)
-            }.navigationTitle("Descriptografar")
-            .navigationBarTitleDisplayMode(.inline)
-        
+        VStack(spacing: 32) {
+
+            VStack(spacing: 12) {
+                Image(systemName: "lock.open.rotation")
+                    .font(.system(size: 44, weight: .medium))
+                    .foregroundStyle(.buttonColors)
+                Text("Digite a chave de criptografia para desbloquear sua nota")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 24)
+            }
+            .padding(.top, 24)
+
+            VStack(alignment: .leading, spacing: 8) {
+
+                TextField("Insira sua chave aqui", text: $chaveDescriptografar1, axis: .vertical)
+                    .lineLimit(5...5)
+                    .padding(16)
+                    .foregroundStyle(.primary)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(.criptographyTextField)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .strokeBorder(Color.black.opacity(0.06), lineWidth: 1)
+                    )
+            }
+            .padding(.horizontal, 24)
+
+            Spacer()
+
+            // Botão
+            Button(action: descriptografar) {
+                Text("Descriptografar")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+            }
+            .background(chaveValida ? Color.buttonColors : Color.gray.opacity(0.4))
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .disabled(!chaveValida)
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
+        }
+        .navigationTitle("Descriptografar")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func descriptografar() {
+        if let notaCriptografada = notaManager.notes.first(where: { $0.estaCriptografado }) {
+            notaManager.decryptNote(
+                note: notaCriptografada,
+                chaveDescriptografar: chaveDescriptografar1
+            )
+            path.wrappedValue = NavigationPath()
+        }
     }
 }
 
 #Preview {
-    NavigationStack{
+    NavigationStack {
         DescriptographyScreen()
             .environment(NoteManager())
     }

@@ -8,74 +8,38 @@
 import SwiftUI
 
 struct BarraInferiorView: View {
-    @Environment(FolderManager.self) private var folderManager
-    @Environment(NoteManager.self) private var noteManager
-    
     let onDelete: () -> Void
-    let onMove: () -> Void
+    let onMove: (Folder) -> Void
     let onEncrypt: () -> Void
     let onShare: () -> Void
+    let pastas: [Folder]
     
+    @Environment(\.navigationPath) private var path
     @State private var alertaCriptografar: Bool = false
     @State private var alertaExcluir: Bool = false
-    @State private var telaCriptografia: Bool = false
     @State private var telaCompartilhar: Bool = false
     @State private var telaMover: Bool = false
-    @State private var mensagemFeedback: String = ""
-    @State private var mostrarFeedback: Bool = false
-    
+
     var body: some View {
         HStack {
             Spacer()
             
             BotaoBarraView(titulo: "Mover", icone: "arrow.forward.folder") {
-                onMove()
                 telaMover = true
             }
             .sheet(isPresented: $telaMover) {
                 NavigationView {
                     List {
-                        let pastasDisponiveis = folderManager.folders.filter { pasta in
-                            if let currentFolder = folderManager.currentFolder {
-                                return pasta.id != currentFolder.id
-                            }
-                            return true
-                        }
-                        
-                        if pastasDisponiveis.isEmpty {
-                            Text("Nenhuma pasta disponível")
-                                .foregroundColor(.secondary)
-                                .padding()
-                        } else {
-                            ForEach(pastasDisponiveis, id: \.id) { pasta in
-                                Button(action: {
-                                    // Pega as notas selecionadas
-                                    let selectedNotes = noteManager.selectedNotes
-                                    
-                                    // Move as notas
-                                    noteManager.moveNotesToFolder(selectedNotes, folderId: pasta.id)
-                                    
-                                    // Fecha a sheet
-                                    telaMover = false
-                                    
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                        mostrarFeedback = false
-                                    }
-                                }) {
-                                    HStack {
-                                        Image(systemName: "folder")
-                                            .foregroundColor(pasta.isDefault ? .blue : .primary)
-                                        Text(pasta.name)
-                                            .foregroundColor(.primary)
-                                        
-                                        Spacer()
-                                        
-                                        let count = noteManager.notes.filter { $0.folderId == pasta.id }.count
-                                        Text("\(count)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
+                        ForEach(pastas) { pasta in
+                            Button(action: {
+                                onMove(pasta)
+                                telaMover = false
+                            }) {
+                                HStack {
+                                    Image(systemName: "folder")
+                                        .foregroundColor(.blue)
+                                    Text(pasta.name)
+                                        .foregroundColor(.primary)
                                 }
                             }
                         }
@@ -84,9 +48,7 @@ struct BarraInferiorView: View {
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            Button(action: {
-                                telaMover = false
-                            }) {
+                            Button(action: { telaMover = false }) {
                                 Image(systemName: "multiply")
                             }
                         }
@@ -97,23 +59,15 @@ struct BarraInferiorView: View {
             Spacer()
             
             BotaoBarraView(titulo: "Criptografar", icone: "lock") {
-                //onEncrypt()
                 alertaCriptografar = true
             }
             .alert("Deseja criptografar essa nota?", isPresented: $alertaCriptografar) {
                 Button("Sim") {
-                    //onEncrypt()
-                   telaCriptografia = true
-
+                    path.wrappedValue.append(RotaNavegacao.telaCriptografia1)
                 }
-                
-                Button("Não", role: .cancel) {
-                    
-                }
+                Button("Não", role: .cancel) { }
             } message: {
                 Text("Após a criptografia você só poderá descriptografar com a chave de acesso.")
-            }.navigationDestination(isPresented: $telaCriptografia){
-                TelaCriptografia1()
             }
             
             Spacer()
@@ -149,42 +103,5 @@ struct BarraInferiorView: View {
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
         .glassEffect(in: Capsule())
-        .overlay(
-            Group {
-                if mostrarFeedback {
-                    Text(mensagemFeedback)
-                        .font(.caption)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(Color.green.opacity(0.8))
-                        .cornerRadius(8)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                        .offset(y: -60)
-                }
-            }
-        )
-    }
-}
-
-#Preview {
-    NavigationStack {
-        ZStack {
-            LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-            
-            VStack {
-                Spacer()
-                BarraInferiorView(
-                    onDelete: {},
-                    onMove: {},
-                    onEncrypt: {},
-                    onShare: {}
-                )
-                .padding(.horizontal)
-                .environment(FolderManager())
-                .environment(NoteManager())
-            }
-        }
     }
 }

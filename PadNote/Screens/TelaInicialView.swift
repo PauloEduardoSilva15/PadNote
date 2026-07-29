@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+enum RotaNavegacao: Hashable {
+    case telaCriptografia1
+    case telaCriptografadoComChave(chave: String)
+    case descriptografar
+    case detalheNota(id: UUID)
+}
+
 struct TelaInicialView: View {
     @State private var noteManager = NoteManager()
     @State private var folderManager = FolderManager()
@@ -15,16 +22,15 @@ struct TelaInicialView: View {
     @State private var refreshID = UUID()
     @State private var mostrarAlertaTitulo: Bool = false
     @State private var tituloNovaNota: String = ""
-    @State private var descriptografarNota: Bool = false
+    
+    @State private var path = NavigationPath()
+    
     let colunas = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
     var displayedNotes: [Note] {
-        let _ = noteManager.notes.count
-        let _ = folderManager.currentFolder?.id
-        
         let allNotes = noteManager.notes
         let currentFolder = folderManager.currentFolder
         
@@ -49,8 +55,21 @@ struct TelaInicialView: View {
         }
     }
     
+    private func bindingParaNota(_ note: Note) -> Binding<Bool> {
+        Binding(
+            get: { noteManager.selectedNoteIds.contains(note.id) },
+            set: { isSelected in
+                if isSelected {
+                    noteManager.selectedNoteIds.insert(note.id)
+                } else {
+                    noteManager.selectedNoteIds.remove(note.id)
+                }
+            }
+        )
+    }
+    
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ZStack(alignment: .bottom) {
                 VStack(spacing: 10) {
                     BarraSuperiorView(menuIniciado: $menuAcionado)
@@ -60,29 +79,17 @@ struct TelaInicialView: View {
                             ForEach(displayedNotes, id: \.id) { note in
                                 Cards(
                                     note: note,
-                                    isSelected: Binding(
-                                        get: { noteManager.selectedNoteIds.contains(note.id) },
-                                        set: { newValue in
-                                            if newValue {
-                                                noteManager.selectedNoteIds.insert(note.id)
-                                            } else {
-                                                noteManager.selectedNoteIds.remove(note.id)
-                                            }
-                                        }
-                                    ),
+                                    isSelected: bindingParaNota(note),
                                     onTap: {
                                         if noteManager.hasSelection {
                                             noteManager.toggleSelection(note)
                                         } else {
-                                            // Navegar para a nota
                                             if note.estaCriptografado {
-                                                //var mudar de tela
-                                                descriptografarNota = true
-                                            }
-                                            else {
+                                                path.append(RotaNavegacao.descriptografar)
+                                            } else {
                                                 noteManager.currentNote = note
+                                                path.append(RotaNavegacao.detalheNota(id: note.id))
                                             }
-                                            
                                         }
                                     },
                                     onLongPress: {
@@ -114,9 +121,13 @@ struct TelaInicialView: View {
                             noteManager.deleteNotes(noteManager.selectedNotes)
                             refreshID = UUID()
                         },
-                        onMove: {},
+                        onMove: { pastaEscolhida in
+                            noteManager.moveNotesToFolder(noteManager.selectedNotes, folderId: pastaEscolhida.id)
+                            refreshID = UUID()
+                        },
                         onEncrypt: {},
-                        onShare: {}
+                        onShare: {},
+                        pastas: folderManager.folders
                     )
                     .id(refreshID)
                 } else {
@@ -133,15 +144,23 @@ struct TelaInicialView: View {
                     BarraDePastasView(menuIniciado: $menuAcionado)
                 }
             }
-            .navigationDestination(isPresented: .constant(noteManager.currentNote != nil)) {
-                if let note = noteManager.currentNote {
-                    NoteScreen(note: note, noteManager: noteManager)
+            .navigationDestination(for: RotaNavegacao.self) { rota in
+                switch rota {
+                case .telaCriptografia1:
+                    TelaCriptografia1()
+                case .telaCriptografadoComChave(let chave):
+                    TelaCriptografadoComChaveView(chave: chave)
+                case .descriptografar:
+                    DescriptographyScreen()
+                case .detalheNota(let id):
+                    if let note = noteManager.notes.first(where: { $0.id == id }) {
+                        NoteScreen(note: note, noteManager: noteManager)
+                    }
                 }
             }
             .onChange(of: noteManager.notes.count) { _, _ in
                 refreshID = UUID()
             }
-            // Alerta para escolher o título
             .alert("Título da Nota", isPresented: $mostrarAlertaTitulo) {
                 TextField("Digite o título", text: $tituloNovaNota)
                     .autocapitalization(.words)
@@ -152,28 +171,31 @@ struct TelaInicialView: View {
                 
                 Button("Criar") {
                     let titulo = tituloNovaNota.trimmingCharacters(in: .whitespacesAndNewlines)
-                    if titulo.isEmpty {
-                        noteManager.createNote(
-                            title: "Nova Nota",
-                            folderId: folderManager.currentFolder?.id
-                        )
-                    } else {
-                        noteManager.createNote(
-                            title: titulo,
-                            folderId: folderManager.currentFolder?.id
-                        )
-                    }
+                    noteManager.createNote(
+                        title: titulo.isEmpty ? "Nova Nota" : titulo,
+                        folderId: folderManager.currentFolder?.id
+                    )
                     refreshID = UUID()
                     tituloNovaNota = ""
                 }
             } message: {
                 Text("Digite o título da sua nova nota")
-            }.navigationDestination(isPresented: $descriptografarNota) {
-                DescriptographyScreen()
             }
         }
+        .environment(\.navigationPath, $path)
         .environment(noteManager)
         .environment(folderManager)
+    }
+}
+
+private struct NavigationPathKey: EnvironmentKey {
+    static let defaultValue: Binding<NavigationPath> = .constant(NavigationPath())
+}
+
+extension EnvironmentValues {
+    var navigationPath: Binding<NavigationPath> {
+        get { self[NavigationPathKey.self] }
+        set { self[NavigationPathKey.self] = newValue }
     }
 }
 
