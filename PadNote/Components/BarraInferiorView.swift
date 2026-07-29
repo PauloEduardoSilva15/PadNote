@@ -10,26 +10,23 @@ import SwiftUI
 struct BarraInferiorView: View {
     @Environment(FolderManager.self) private var folderManager
     @Environment(NoteManager.self) private var noteManager
-    
+    @Environment(\.navigationPath) private var path
+
     let onDelete: () -> Void
-    let onMove: () -> Void
-    let onEncrypt: () -> Void
     let onShare: () -> Void
-    
+
     @State private var alertaCriptografar: Bool = false
     @State private var alertaExcluir: Bool = false
-    @State private var telaCriptografia: Bool = false
     @State private var telaCompartilhar: Bool = false
     @State private var telaMover: Bool = false
     @State private var mensagemFeedback: String = ""
     @State private var mostrarFeedback: Bool = false
-    
+
     var body: some View {
         HStack {
             Spacer()
-            
+
             BotaoBarraView(titulo: "Mover", icone: "arrow.forward.folder") {
-                onMove()
                 telaMover = true
             }
             .sheet(isPresented: $telaMover) {
@@ -41,7 +38,7 @@ struct BarraInferiorView: View {
                             }
                             return true
                         }
-                        
+
                         if pastasDisponiveis.isEmpty {
                             Text("Nenhuma pasta disponível")
                                 .foregroundColor(.secondary)
@@ -49,16 +46,13 @@ struct BarraInferiorView: View {
                         } else {
                             ForEach(pastasDisponiveis, id: \.id) { pasta in
                                 Button(action: {
-                                    // Pega as notas selecionadas
                                     let selectedNotes = noteManager.selectedNotes
-                                    
-                                    // Move as notas
                                     noteManager.moveNotesToFolder(selectedNotes, folderId: pasta.id)
-                                    
-                                    // Fecha a sheet
+
+                                    mensagemFeedback = "Movido para \(pasta.name)"
+                                    mostrarFeedback = true
                                     telaMover = false
-                                    
-                                    
+
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                         mostrarFeedback = false
                                     }
@@ -68,9 +62,9 @@ struct BarraInferiorView: View {
                                             .foregroundColor(pasta.isDefault ? .blue : .primary)
                                         Text(pasta.name)
                                             .foregroundColor(.primary)
-                                        
+
                                         Spacer()
-                                        
+
                                         let count = noteManager.notes.filter { $0.folderId == pasta.id }.count
                                         Text("\(count)")
                                             .font(.caption)
@@ -84,40 +78,31 @@ struct BarraInferiorView: View {
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            Button(action: {
-                                telaMover = false
-                            }) {
+                            Button(action: { telaMover = false }) {
                                 Image(systemName: "multiply")
                             }
                         }
                     }
                 }
             }
-            
+
             Spacer()
-            
+
             BotaoBarraView(titulo: "Criptografar", icone: "lock") {
-                //onEncrypt()
                 alertaCriptografar = true
             }
             .alert("Deseja criptografar essa nota?", isPresented: $alertaCriptografar) {
                 Button("Sim") {
-                    //onEncrypt()
-                   telaCriptografia = true
-
-                }
-                
-                Button("Não", role: .cancel) {
+                    path.wrappedValue.append(RotaNavegacao.telaCriptografia1)
                     
                 }
+                Button("Não", role: .cancel) { }
             } message: {
                 Text("Após a criptografia você só poderá descriptografar com a chave de acesso.")
-            }.navigationDestination(isPresented: $telaCriptografia){
-                TelaCriptografia1()
             }
-            
+
             Spacer()
-            
+
             BotaoBarraView(titulo: "Compartilhar", icone: "square.and.arrow.up") {
                 onShare()
                 telaCompartilhar = true
@@ -129,9 +114,9 @@ struct BarraInferiorView: View {
                         .ignoresSafeArea()
                 }
             }
-            
+
             Spacer()
-            
+
             BotaoBarraView(titulo: "Excluir", icone: "trash", isDestructive: true) {
                 alertaExcluir = true
             }
@@ -143,7 +128,7 @@ struct BarraInferiorView: View {
             } message: {
                 Text("Após essa ação a nota será excluída. Essa ação não poderá ser desfeita.")
             }
-            
+
             Spacer()
         }
         .padding(.vertical, 12)
@@ -164,27 +149,5 @@ struct BarraInferiorView: View {
                 }
             }
         )
-    }
-}
-
-#Preview {
-    NavigationStack {
-        ZStack {
-            LinearGradient(colors: [.blue, .purple], startPoint: .top, endPoint: .bottom)
-                .ignoresSafeArea()
-            
-            VStack {
-                Spacer()
-                BarraInferiorView(
-                    onDelete: {},
-                    onMove: {},
-                    onEncrypt: {},
-                    onShare: {}
-                )
-                .padding(.horizontal)
-                .environment(FolderManager())
-                .environment(NoteManager())
-            }
-        }
     }
 }
